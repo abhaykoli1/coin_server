@@ -56,7 +56,7 @@ app.get("/api/uploads/:filename", (req, res) => {
 // ✅ Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"], // user + admin frontends
+    origin: ["http://localhost:5173", "*", ""], // user + admin frontends
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -68,9 +68,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // ✅ Env Variables
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/coinwave247_new";
-const CLIENT_ORIGINS = (process.env.CLIENT_ORIGINS || "http://localhost:5173,http://localhost:5174")
-  .split(",");
+const MONGO_URI =
+  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/coinwave247_new";
+const CLIENT_ORIGINS = (
+  process.env.CLIENT_ORIGINS || "http://localhost:5173,http://localhost:5174"
+).split(",");
 
 // ✅ Root test route
 app.get("/api", (req, res) => {
@@ -121,7 +123,10 @@ io.use((socket, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token.replace(/^Bearer\s+/i, ""), process.env.JWT_SECRET || "your_jwt_secret");
+    const decoded = jwt.verify(
+      token.replace(/^Bearer\s+/i, ""),
+      process.env.JWT_SECRET || "your_jwt_secret"
+    );
     // attach user info to socket (if your token contains user id)
     socket.user = decoded;
     if (decoded && decoded._id) {
@@ -138,7 +143,12 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("🟦 Socket connected:", socket.id, "user:", socket.user ? socket.user._id : "anon");
+  console.log(
+    "🟦 Socket connected:",
+    socket.id,
+    "user:",
+    socket.user ? socket.user._id : "anon"
+  );
 
   // example: client can join custom rooms
   socket.on("joinRoom", (room) => {
@@ -176,7 +186,9 @@ mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("✅ MongoDB connected successfully");
-    server.listen(PORT, () => console.log(`🚀 Server running at: http://localhost:${PORT}`));
+    server.listen(PORT, () =>
+      console.log(`🚀 Server running at: http://localhost:${PORT}`)
+    );
   })
   .catch((err) => {
     console.error("❌ MongoDB connection failed:", err.message);
